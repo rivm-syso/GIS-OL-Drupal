@@ -1,0 +1,146 @@
+<?php
+
+/* Vragen aan Martin:
+ * 
+ * 1. de functie gis_ol_node_view wordt voor elke node aangeroepen. Ook als de node niet van het type gis_ol_map is. Hoezo?????
+ * 
+ * 2. hoe zorg ik er voor dat alleen op pagina's met gis_ol-node de juiste library wordt geladen?
+ *    
+ * 3. Hoe zorg ik er voor dat de behavior maar 1 keer wordt uitgevoerd? En niet alleen maar na clear-cache!!!!!
+ * 
+ * 4. Waarom returnt $entity->get_value() een array met een assoc-array???
+ * 
+*/
+function rob_debug($o) {
+	$fname='C:\\Bitnami\\drupal-8.5.4-0\\apps\\drupal\\htdocs\\sites\\all\\modules\\gis_ol\\debug.html';
+	file_put_contents($fname,date('d-m-Y H:i:s').': '.var_export($o,true).'<br>'.file_get_contents($fname));
+}
+
+function __get_value(&$entity,$field,$default_value='') {
+	try {
+		$f=$entity->get($field);
+		if ($f) {
+			$v=$f->getValue();
+			if (isset($v[0]['value'])) {return $v[0]['value'];}
+		}
+	} catch(Exception $e) {
+	}
+    return $default_value;
+}
+
+function gis_ol_node_view(array &$build, \Drupal\Core\Entity\EntityInterface $entity, \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display, $view_mode) {
+    if ($entity->bundle()=='gis_ol') {
+        
+        $gis_ol_node_id=$entity->id();
+		$uiterlijk='0';
+
+        $parms='';
+		// gewone parameters klaar zetten
+        $body=__get_value($entity,'gis_ol_body');
+		$body=preg_replace("/\r\n/","\r",$body);
+		$body=preg_replace("/\n/","\r",$body);
+		$body=explode("\r",$body);
+		foreach ($body as $b) {
+			if (substr($b,0,4)=='tmp=') {$b='tmp=0';} // reset positie 0 van tmp
+			$parms.=($parms==''?'':',').$b;
+			if (substr($b,0,2)=='u=') {$uiterlijk=substr($b,2);}
+		}
+        // layer_definities er achter plakken
+        $ldefs=str_replace("\r\n","\r",__get_value($entity,'gis_ol_layer_definities'));
+        $ldefs=str_replace("\n","\r",$ldefs);
+        $ldefs=explode("\r",$ldefs);
+        $parms.=',ld=';
+        foreach ($ldefs as $ldef) {
+            if ($ldef!='') {$parms.=base64_encode($ldef).'|';}
+        }
+        
+		/*	Alternatief:
+		$kaart='<div class="map-holder gis_ol">';
+        $kaart.='<div id="gis_ol_map_'.$gis_ol_node_id.'" class="map" parms="'.$parms.'" dwnld="'.__DIR__.'"></div>';
+        $kaart.='<div id="popup'.$gis_ol_node_id.'" class="ol-popup"><a href="#" id="popup-closer'.$gis_ol_node_id.'" class="ol-popup-closer"></a><div id="popup-content'.$gis_ol_node_id.'"></div></div>';
+        $kaart.='</div>';
+        $build['_map']=[
+            '#markup' => $kaart,
+        ];*/
+		$dwnld=__DIR__;
+		$loader = new Twig_Loader_Array(array('gis_ol.html.twig' => file_get_contents($dwnld.'/templates/gis-ol.html.twig')));
+		$twig = new Twig_Environment($loader);
+        $build['_map']=[
+            '#markup' => $twig->render('gis_ol.html.twig', array('node_id'=>$gis_ol_node_id,'parms'=>$parms,'dwnld'=>$dwnld)),
+        ];
+        
+        $build['#attached']['library'][] = 'gis_ol/gis_ol';
+        switch($uiterlijk) {
+            case '1':
+                $build['#attached']['library'][] = 'gis_ol/gis_ol_wit_rond';
+                break;
+            default:
+                $build['#attached']['library'][] = 'gis_ol/gis_ol_default';
+                break;
+        }
+    }
+}
+function gis_ol_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
+//rob_debug($form_id);
+    if ($form_id == 'node_gis_ol_form' || $form_id == 'node_gis_ol_edit_form') {
+        //rob_debug($form_state);
+        $form['#attached']['library'][] = 'gis_ol/gis_ol_edit';
+        $xml=simplexml_load_file('http://geodata.rivm.nl/geoserver/wms?VERSION=1.1.1&REQUEST=GetCapabilities');
+        $wms='';
+        if ($xml->Capability->Layer) foreach ($xml->Capability->Layer->children() as $layer) {
+            $name=$layer->Name;
+            $title=$layer->Title;
+            if ($name!='') {
+                $wms.=($wms==''?'':'|').$name.'='.$title;
+            }
+        }
+        $form['#attached']['drupalSettings']['gis_ol']['wms'] = $wms;
+
+		$readFromServer=true; $fname='datarivmnl.def';
+		if (file_exists($fname)) {$readFromServer=false;}
+		if ($readFromServer) {
+			$xml=file_get_contents('https://data.rivm.nl/geonetwork/srv/dut/csw-ngr?service=CSW&resultType=results&version=2.0.2&request=GetRecords&MaxRecords=1000');
+			$xml=preg_replace("/(<\/?)(\w+):([^>]*>)/", "$1$2$3", $xml);
+			$xml=new SimpleXMLElement($xml);
+			$wms='';
+			foreach ($xml->cswSearchResults->children() as $layer) {
+				$layerXML=file_get_contents('https://data.rivm.nl/geonetwork/srv/dut/csw-ngr?request=GetRecordById&service=CSW&version=2.0.2&elementSetName=full&id='.$layer->dcidentifier);
+				$layerXML=preg_replace("/(<\/?)(\w+):([^>]*>)/", "$1$2$3", $layerXML);
+				$layerXML=new SimpleXMLElement($layerXML);
+				if ($layer->dctitle!='') {
+					foreach ($layerXML->cswRecord->children() as $key=>$value) if ($key=='dcURI' && $value['protocol']=='OGC:WMS') {
+						$server=$value[0];
+						if (substr($server,-1,1)=='?') {$server=substr($server,0,strlen($server)-1);}
+						if (substr($server,-1,1)=='/') {$server=substr($server,0,strlen($server)-1);}
+						if ($server!='' && $value['name']!='') {
+							$wms.=($wms==''?'':'|');
+							$wms.=$server.'='.$layer->dctitle.'='.$value['name'];
+						}
+					}
+				}
+			}
+			file_put_contents($fname,$wms);
+		} else {
+			$wms=file_get_contents($fname);
+		}
+        $form['#attached']['drupalSettings']['gis_ol']['datarivmnl'] = $wms;
+		
+    }
+}
+
+function gis_ol_entity_presave(Drupal\Core\Entity\EntityInterface $entity) {
+	if ($entity->bundle()=='gis_ol') {
+		$body=__get_value($entity,'gis_ol_body');
+		$body=preg_replace("/\r\n/","\r",$body);
+		$body=preg_replace("/\n/","\r",$body);
+		$body=explode("\r",$body);
+		foreach ($body as $b) {
+			if (substr($b,0,4)=='tmp=') {
+				if (substr($b,4,1)=='1') {
+					$fname='datarivmnl.def';
+					if (file_exists($fname)) {unlink($fname);}
+				}
+			}
+		}
+  }
+}

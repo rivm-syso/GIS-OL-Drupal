@@ -1,0 +1,20 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.gis_ol_body
+    - node.type.gis_ol
+  module:
+    - gis_ol
+id: node.gis_ol.gis_ol_body
+field_name: gis_ol_body
+entity_type: node
+bundle: gis_ol
+label: 'Body'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string_long

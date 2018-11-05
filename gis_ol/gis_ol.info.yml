@@ -1,0 +1,10 @@
+name: GIS Openlayers Module
+description: Creates a content type and field for GIS openlayers.
+package: GIS
+
+type: module
+core: 8.x
+
+configure: gis_ol.settings
+
+php: 5.6

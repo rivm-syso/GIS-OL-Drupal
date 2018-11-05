@@ -1,0 +1,7 @@
+gis_ol.content:
+  path: '/gis_ol'
+  defaults:
+    _controller: '\Drupal\gis_ol\Controller\gis_olController::content'
+    _title: 'GIS Openlayers voor Drupal, Node listing'
+  requirements:
+    _permission: 'access content'

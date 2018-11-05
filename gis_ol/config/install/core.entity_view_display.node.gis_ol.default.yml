@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  optional:
+  config:
+    - node.type.gis_ol
+    - field.field.node.gis_ol.gis_ol_body
+    - field.field.node.gis_ol.gis_ol_layer_definities
+  module:
+    - user
+id: node.gis_ol.default
+targetEntityType: node
+bundle: gis_ol
+mode: default
+content:
+hidden:
+  gis_ol_body: true
+  gis_ol_layer_definities: true

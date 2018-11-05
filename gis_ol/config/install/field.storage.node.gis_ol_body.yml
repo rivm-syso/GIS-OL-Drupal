@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+    - gis_ol
+id: node.gis_ol_body
+field_name: gis_ol_body
+entity_type: node
+type: string_long
+settings: {  }
+module: core
+locked: false
+cardinality: 1
+translatable: false
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

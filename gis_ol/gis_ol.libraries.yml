@@ -1,0 +1,34 @@
+gis_ol:
+  version: 1.0
+  css:
+    layout:
+      https://cdnjs.cloudflare.com/ajax/libs/openlayers/4.6.5/ol.css: {}
+      css/gis_ol.min.css: {}
+  js:
+    https://cdnjs.cloudflare.com/ajax/libs/openlayers/4.6.5/ol.js: {}
+    js/gis_ol.min.js: {}
+    js/gis_ol_filter.min.js: {}
+    js/gis_ol_layer_switcher.min.js: {}
+    js/proj4.js: {}
+    js/jquery.autocomplete.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal.ajax
+gis_ol_edit:
+  version: 1.0
+  js:
+    js/gis_ol_edit.min.js: {}
+    js/gis_ol_filter.min.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupal.dialog.ajax
+gis_ol_default:
+  version: 1.0
+  css:
+    layout:
+      css/gis_ol_default.min.css: {}
+gis_ol_wit_rond:
+  version: 1.0
+  css:
+    layout:
+      css/gis_ol_wit_rond.min.css: {}
