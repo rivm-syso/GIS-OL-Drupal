@@ -33,15 +33,16 @@
 
 ### Aditional
 
-<p>In order to place the map as a part of a webpage, you will have to extend the contenttype &quot;Basic page&quot; (or &quot;Paragraph&quot;, or &hellip;) with a reference-field (referring to the gis_ol contenttype)<p>
-<p>It is possible to add multiple maps to a webpage (or paragraph)<p>
+<ul>
+<li>In order to place the map as a part of a webpage, you will have to extend the contenttype &quot;Basic page&quot; (or &quot;Paragraph&quot;, or &hellip;) with a reference-field (referring to the gis_ol contenttype)</li>
+<li>It is possible to add multiple maps to a webpage (or paragraph)</li>
+<li>Choose &quot;GIS Openlayers module settings&quot; from the &quot;Configuration&quot; -&gt; &quot;Development&quot; section to list all maps/nodes (or use the URL: /drupal/gis_ol)</li>
+</ul>
 
 
 ## Built With
 
-Openlayers 4.1 - 4.2
-Proj4
-jQuery autocomplete
+<p>Openlayers 4.1 - 4.2<br>Proj4<br>jQuery autocomplete</p>
 
 ## Authors
 
