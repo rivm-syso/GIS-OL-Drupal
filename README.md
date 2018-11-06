@@ -1,11 +1,11 @@
 # GIS-OL-Drupal
-<p>The gis_ol module provides in a contenttype in Drupal which allows editors to define their own maps. The module uses Openlayers; An open source javascript library which can be used to build GIS-applications.</p>
-<p>An editor can create maps with a variaty of options<ul>
+<p>The gis_ol module provides in a Drupal contenttype which allows editors to define their own maps. The module uses Openlayers; An open source javascript library which can be used to build GIS-applications.</p>
+<p>An editor can create maps with a variaty of options:<ul>
 	<li>Select base layers</li>
 	<li>Configure additional layers</li>
 	<li>Configure data filtering and - downloading</li>
 	<li>Configure behaviour (zoom buttons, fulscreen button, etc.)</li>
-	<li>Etc.</li>
+	<li>&hellip;</li>
 </ul></p>
 
 ## Getting Started
@@ -21,6 +21,13 @@
 <ol>
 	<li>Copy the files to the folder: ....drupal\htdocs\sites\all\modules\gis_ol</li>
 	<li>Install the module via the admin-extend functionality.</li>
+</ol>
+
+### Upgrading
+
+<ol>
+	<li>Copy the (changed) files to the folder: ....drupal\htdocs\sites\all\modules\gis_ol</li>
+	<li>Clear the cache.</li>
 </ol>
 
 ### General use
