@@ -17,6 +17,8 @@ gis_ol:
 gis_ol_edit:
   version: 1.0
   js:
+    https://cdnjs.cloudflare.com/ajax/libs/openlayers/4.6.5/ol.js: {}
+    js/gis_ol.min.js: {}
     js/gis_ol_edit.min.js: {}
     js/gis_ol_filter.min.js: {}
   dependencies:

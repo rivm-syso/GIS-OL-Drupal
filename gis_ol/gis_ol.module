@@ -1,22 +1,21 @@
 <?php
 
-/* Vragen aan Martin:
- * 
- * 1. de functie gis_ol_node_view wordt voor elke node aangeroepen. Ook als de node niet van het type gis_ol_map is. Hoezo?????
- * 
- * 2. hoe zorg ik er voor dat alleen op pagina's met gis_ol-node de juiste library wordt geladen?
- *    
- * 3. Hoe zorg ik er voor dat de behavior maar 1 keer wordt uitgevoerd? En niet alleen maar na clear-cache!!!!!
- * 
- * 4. Waarom returnt $entity->get_value() een array met een assoc-array???
- * 
-*/
-function rob_debug($o) {
-	$fname='C:\\Bitnami\\drupal-8.5.4-0\\apps\\drupal\\htdocs\\sites\\all\\modules\\gis_ol\\debug.html';
-	file_put_contents($fname,date('d-m-Y H:i:s').': '.var_export($o,true).'<br>'.file_get_contents($fname));
-}
+/**
+ * Module file for the gis_ol bundle.
+ */
 
-function __get_value(&$entity,$field,$default_value='') {
+/**
+ * Function to find specific field and return the value.
+ *
+ * @param \Drupal\Core\Entity $entity 
+ *   The entity to get the value from
+ *
+ * @param string $field
+ *    The field name
+ *
+ * @return: Value found, or default value
+ */
+function gis_ol__get_value(&$entity,$field,$default_value='') {
 	try {
 		$f=$entity->get($field);
 		if ($f) {
@@ -28,6 +27,11 @@ function __get_value(&$entity,$field,$default_value='') {
     return $default_value;
 }
 
+/**
+ * Implements hook_node_view() for gis_ol_node_view()
+ *
+ * Sets the right libraries and pass data to twig-file.
+ */
 function gis_ol_node_view(array &$build, \Drupal\Core\Entity\EntityInterface $entity, \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display, $view_mode) {
     if ($entity->bundle()=='gis_ol') {
         
@@ -36,7 +40,7 @@ function gis_ol_node_view(array &$build, \Drupal\Core\Entity\EntityInterface $en
 
         $parms='';
 		// gewone parameters klaar zetten
-        $body=__get_value($entity,'gis_ol_body');
+        $body=gis_ol__get_value($entity,'gis_ol_body');
 		$body=preg_replace("/\r\n/","\r",$body);
 		$body=preg_replace("/\n/","\r",$body);
 		$body=explode("\r",$body);
@@ -46,7 +50,7 @@ function gis_ol_node_view(array &$build, \Drupal\Core\Entity\EntityInterface $en
 			if (substr($b,0,2)=='u=') {$uiterlijk=substr($b,2);}
 		}
         // layer_definities er achter plakken
-        $ldefs=str_replace("\r\n","\r",__get_value($entity,'gis_ol_layer_definities'));
+        $ldefs=str_replace("\r\n","\r",gis_ol__get_value($entity,'gis_ol_layer_definities'));
         $ldefs=str_replace("\n","\r",$ldefs);
         $ldefs=explode("\r",$ldefs);
         $parms.=',ld=';
@@ -69,7 +73,10 @@ function gis_ol_node_view(array &$build, \Drupal\Core\Entity\EntityInterface $en
             '#markup' => $twig->render('gis_ol.html.twig', array('node_id'=>$gis_ol_node_id,'parms'=>$parms,'dwnld'=>$dwnld)),
         ];
         
+		// basis library
         $build['#attached']['library'][] = 'gis_ol/gis_ol';
+		
+		// aanvullen met specifieke library
         switch($uiterlijk) {
             case '1':
                 $build['#attached']['library'][] = 'gis_ol/gis_ol_wit_rond';
@@ -80,12 +87,16 @@ function gis_ol_node_view(array &$build, \Drupal\Core\Entity\EntityInterface $en
         }
     }
 }
+
+/**
+ * Implements hook_form_alter() for gis_ol_form_alter()
+ *
+ * Sets the right libraries and pass data to javascript functions about several sources of layers.
+ */
 function gis_ol_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
-//rob_debug($form_id);
     if ($form_id == 'node_gis_ol_form' || $form_id == 'node_gis_ol_edit_form') {
-        //rob_debug($form_state);
         $form['#attached']['library'][] = 'gis_ol/gis_ol_edit';
-        $xml=simplexml_load_file('http://geodata.rivm.nl/geoserver/wms?VERSION=1.1.1&REQUEST=GetCapabilities');
+        $xml=simplexml_load_file('https://geodata.rivm.nl/geoserver/wms?VERSION=1.1.1&REQUEST=GetCapabilities');
         $wms='';
         if ($xml->Capability->Layer) foreach ($xml->Capability->Layer->children() as $layer) {
             $name=$layer->Name;
@@ -128,9 +139,17 @@ function gis_ol_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_st
     }
 }
 
+/**
+ * Implements hook_entity_presave() for gis_ol_entity_presave()
+ *
+ * Called before saving a Map, to check if the file datarivmnl.def should be removed.
+ * This file contains all available layers from data.rivm.nl.
+ * It will be regenerated upon the first edit of a Map.
+ *
+ */
 function gis_ol_entity_presave(Drupal\Core\Entity\EntityInterface $entity) {
 	if ($entity->bundle()=='gis_ol') {
-		$body=__get_value($entity,'gis_ol_body');
+		$body=gis_ol__get_value($entity,'gis_ol_body');
 		$body=preg_replace("/\r\n/","\r",$body);
 		$body=preg_replace("/\n/","\r",$body);
 		$body=explode("\r",$body);
