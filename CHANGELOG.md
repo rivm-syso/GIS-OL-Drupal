@@ -1,6 +1,6 @@
 # Data versions
 
-## Version 0 (2018-11-06)
+## Version 0 (2018-11-13)
 
 <ol>
 	<li>w: width of map</li>
@@ -11,6 +11,7 @@
 	<li>z: Zoom-buttons</li>
 	<li>e: Zoom-extend button</li>
 	<li>p: Position search</li>
+	<li>pz: Zoom level after position search</li>
 	<li>f: Full-screen button</li>
 	<li>l: Layers button (options: On/Off, Radio/Checkbox, Opacity slider, Download, Metadata, Legend)</li>
 	<li>sb: Scalebar</li>
