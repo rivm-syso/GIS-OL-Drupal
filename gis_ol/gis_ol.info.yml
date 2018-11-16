@@ -1,5 +1,5 @@
 name: GIS Openlayers Module
-description: Creates a content type and field for GIS openlayers.
+description: Creates a content type and fields for GIS openlayers.
 package: GIS
 
 type: module

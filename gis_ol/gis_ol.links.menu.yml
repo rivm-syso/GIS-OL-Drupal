@@ -1,6 +1,6 @@
 gis_ol.admin:
-  title: 'GIS Openlayers module settings'
-  description: 'GIS Openlayers module settings'
+  title: 'GIS Openlayers'
+  description: 'GIS Openlayers'
   parent: system.admin_config_development
   route_name: gis_ol.content
   weight: 100
