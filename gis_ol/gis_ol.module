@@ -36,7 +36,7 @@ function gis_ol_node_view(array &$build, \Drupal\Core\Entity\EntityInterface $en
     if ($entity->bundle()=='gis_ol') {
         
         $gis_ol_node_id=$entity->id();
-		$uiterlijk='0';
+		$uiterlijk='groen';
 
         $parms='';
 		// gewone parameters klaar zetten
@@ -45,7 +45,7 @@ function gis_ol_node_view(array &$build, \Drupal\Core\Entity\EntityInterface $en
 		$body=preg_replace("/\n/","\r",$body);
 		$body=explode("\r",$body);
 		foreach ($body as $b) {
-			if (substr($b,0,4)=='tmp=') {$b='tmp=0';} // reset positie 0 van tmp
+			if (substr($b,0,2)=='m=') {$b='m='.base64_encode(htmlspecialchars(trim(substr($b,2))));}
 			$parms.=($parms==''?'':',').$b;
 			if (substr($b,0,2)=='u=') {$uiterlijk=substr($b,2);}
 		}
@@ -77,14 +77,7 @@ function gis_ol_node_view(array &$build, \Drupal\Core\Entity\EntityInterface $en
         $build['#attached']['library'][] = 'gis_ol/gis_ol';
 		
 		// aanvullen met specifieke library
-        switch($uiterlijk) {
-            case '1':
-                $build['#attached']['library'][] = 'gis_ol/gis_ol_wit_rond';
-                break;
-            default:
-                $build['#attached']['library'][] = 'gis_ol/gis_ol_default';
-                break;
-        }
+		$build['#attached']['library'][] = 'gis_ol/gis_ol_'.$uiterlijk;
     }
 }
 

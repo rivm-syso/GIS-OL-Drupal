@@ -24,13 +24,93 @@ gis_ol_edit:
   dependencies:
     - core/jquery
     - core/drupal.dialog.ajax
-gis_ol_default:
+gis_ol_automatisch:
   version: 1.0
   css:
     layout:
-      css/gis_ol_default.min.css: {}
-gis_ol_wit_rond:
+      css/gis_ol_donkergroen.min.css: {}
+gis_ol_bruin:
   version: 1.0
   css:
     layout:
-      css/gis_ol_wit_rond.min.css: {}
+      css/gis_ol_bruin.min.css: {}
+gis_ol_donkerblauw:
+  version: 1.0
+  css:
+    layout:
+      css/gis_ol_donkerblauw.min.css: {}
+gis_ol_donkerbruin:
+  version: 1.0
+  css:
+    layout:
+      css/gis_ol_donkerbruin.min.css: {}
+gis_ol_donkergeel:
+  version: 1.0
+  css:
+    layout:
+      css/gis_ol_donkergeel.min.css: {}
+gis_ol_donkergroen:
+  version: 1.0
+  css:
+    layout:
+      css/gis_ol_donkergroen.min.css: {}
+gis_ol_geel:
+  version: 1.0
+  css:
+    layout:
+      css/gis_ol_geel.min.css: {}
+gis_ol_groen:
+  version: 1.0
+  css:
+    layout:
+      css/gis_ol_groen.min.css: {}
+gis_ol_hemelblauw:
+  version: 1.0
+  css:
+    layout:
+      css/gis_ol_hemelblauw.min.css: {}
+gis_ol_lichtblauw:
+  version: 1.0
+  css:
+    layout:
+      css/gis_ol_lichtblauw.min.css: {}
+gis_ol_mintgroen:
+  version: 1.0
+  css:
+    layout:
+      css/gis_ol_mintgroen.min.css: {}
+gis_ol_mosgroen:
+  version: 1.0
+  css:
+    layout:
+      css/gis_ol_mosgroen.min.css: {}
+gis_ol_oranje:
+  version: 1.0
+  css:
+    layout:
+      css/gis_ol_oranje.min.css: {}
+gis_ol_paars:
+  version: 1.0
+  css:
+    layout:
+      css/gis_ol_paars.min.css: {}
+gis_ol_robijnrood:
+  version: 1.0
+  css:
+    layout:
+      css/gis_ol_robijnrood.min.css: {}
+gis_ol_rood:
+  version: 1.0
+  css:
+    layout:
+      css/gis_ol_rood.min.css: {}
+gis_ol_roze:
+  version: 1.0
+  css:
+    layout:
+      css/gis_ol_roze.min.css: {}
+gis_ol_violet:
+  version: 1.0
+  css:
+    layout:
+      css/gis_ol_violet.min.css: {}
