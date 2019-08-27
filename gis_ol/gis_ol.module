@@ -85,10 +85,20 @@ function gis_ol_node_view(array &$build, \Drupal\Core\Entity\EntityInterface $en
  * Implements hook_form_alter() for gis_ol_form_alter()
  *
  * Sets the right libraries and pass data to javascript functions about several sources of layers.
+ *
+ * The layers for each layer-type are read from different sources:
+ *     - WMS:		  The layers are read from the server via a GetCapabilities request
+ *	   - WMSinput:	  Uses the layers from WMS
+ *	   - datarivmnl:  Reads layers from cached-file or via a GetRecords request (followed by an GetRecordsById request per layer)
+ *	   - Vectortile:  The layers are read from the server via a bare tms request
+ *
  */
 function gis_ol_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
     if ($form_id == 'node_gis_ol_form' || $form_id == 'node_gis_ol_edit_form') {
+		
         $form['#attached']['library'][] = 'gis_ol/gis_ol_edit';
+		
+		// read WMS (and WMSinput) layers
         $xml=simplexml_load_file('https://geodata.rivm.nl/geoserver/wms?VERSION=1.1.1&REQUEST=GetCapabilities');
         $wms='';
         if ($xml->Capability->Layer) foreach ($xml->Capability->Layer->children() as $layer) {
@@ -100,6 +110,7 @@ function gis_ol_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_st
         }
         $form['#attached']['drupalSettings']['gis_ol']['wms'] = $wms;
 
+		// read datarivmnl layers
 		$readFromServer=true; $fname='datarivmnl.def';
 		if (file_exists($fname)) {$readFromServer=false;}
 		if ($readFromServer) {
@@ -129,6 +140,18 @@ function gis_ol_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_st
 		}
         $form['#attached']['drupalSettings']['gis_ol']['datarivmnl'] = $wms;
 		
+		// read Vectortile layers
+        $xml=simplexml_load_file('http://rivm-gistc-l01a.rivm.ssc-campus.nl:8080/geoserver/gwc/service/tms/1.0.0');
+        $wms='';
+        if ($xml->Tilemaps) foreach ($xml->Tilemaps->children() as $layer) {
+            $title=$layer->title;
+            if ($title!='' && $layer->srs=='EPSG:28992' && stripos($layer->href,'@pbf')!==false) {
+                $wms.=($wms==''?'':'|').$title.'='.$title;
+            }
+        }
+        $form['#attached']['drupalSettings']['gis_ol']['vectortile'] = $wms;
+		
+		
     }
 }
 
@@ -155,4 +178,13 @@ function gis_ol_entity_presave(Drupal\Core\Entity\EntityInterface $entity) {
 			}
 		}
   }
+}
+
+/**
+ */
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\field\Entity\FieldConfig;
+function gis_ol_uninstall() {
+	FieldStorageConfig::loadByName('node', 'gis_ol_body')->delete();
+	FieldStorageConfig::loadByName('node', 'gis_ol_layer_definities')->delete();
 }
