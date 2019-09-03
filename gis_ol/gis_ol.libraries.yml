@@ -114,8 +114,8 @@ gis_ol_violet:
   css:
     layout:
       css/gis_ol_violet.min.css: {}
-gis_ia_wit:
+gis_ol_wit:
   version: 1.0
   css:
     layout:
-      css/gis_ia_wit.min.css: {}
+      css/gis_ol_wit.min.css: {}
