@@ -111,7 +111,7 @@ function gis_ol_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_st
         $form['#attached']['drupalSettings']['gis_ol']['wms'] = $wms;
 
 		// read datarivmnl layers
-		$readFromServer=true; $fname='datarivmnl.def';
+		$readFromServer=true; $fname=__DIR__.'datarivmnl.def';
 		if (file_exists($fname)) {$readFromServer=false;}
 		if ($readFromServer) {
 			$xml=file_get_contents('https://data.rivm.nl/geonetwork/srv/dut/csw-ngr?service=CSW&resultType=results&version=2.0.2&request=GetRecords&MaxRecords=1000');
